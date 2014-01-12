@@ -30,7 +30,7 @@ Write your configuration file (for example `config.json`) as a JSON object, like
 		// ...
 	}
 
-In you Go code, have a struct ready to contain this configuration:
+In your Go code, have a struct ready to contain this configuration:
 
 	type Config struct {
 		ListenAddress     string   `json:"listen_address"`
@@ -40,7 +40,7 @@ In you Go code, have a struct ready to contain this configuration:
 
 Note: you don't have to provide the JSON key names if you use camelCase in your JSON file, too. Read more about it [here](http://golang.org/pkg/encoding/json/#Marshal).
 
-*Make sure* the *fields* in your configuration struct are *exported*, i.e. uppercase, or else the `encoding/json` package will not be able to fill them.
+**Make sure** the **fields** in your configuration struct are **exported**, i.e. uppercase, or else the `encoding/json` package will not be able to fill them.
 
 Then in your Go code, do this:
 
@@ -55,7 +55,7 @@ Then in your Go code, do this:
 		}
 	}
 
-That's it, you can now easily access you configuration parameters in your code.
+That's it, you can now easily access your configuration parameters in your code.
 
 ## Documentation
 
