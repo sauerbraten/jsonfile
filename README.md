@@ -59,7 +59,7 @@ That's it, you can now easily access you configuration parameters in your code.
 
 ## Documentation
 
-Proper documentation is at http://godoc.org/github.com/sauerbraten/persona. There isn't much to say, really.
+Proper documentation is at http://godoc.org/github.com/sauerbraten/jsonconf. There isn't much to say, really.
 
 ## License
 
