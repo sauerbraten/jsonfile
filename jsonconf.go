@@ -1,4 +1,4 @@
-package jsonconf
+package jsonfile
 
 import (
 	"bufio"
@@ -8,54 +8,54 @@ import (
 	"os"
 )
 
-type configFileFilter struct {
-	configFile io.ByteReader
-	pos        int  // current position in the file
-	inString   bool // true if current position points inside a string; used to only strip whitespace outside of strings
+type fileFilter struct {
+	file     io.ByteReader
+	pos      int  // current position in the file
+	inString bool // true if current position points inside a string; used to only strip whitespace outside of strings
 }
 
-func newConfigFileFilter(fileName string) (cff *configFileFilter, err error) {
+func newfileFilter(fileName string) (ff *fileFilter, err error) {
 	var file *os.File
 	file, err = os.Open(fileName)
 
-	cff = &configFileFilter{configFile: bufio.NewReader(file)}
+	ff = &fileFilter{file: bufio.NewReader(file)}
 
 	return
 }
 
-// Reads from the config file and strips whitespace outside of strings as well as comments. With this method, configFileTilter implements io.Reader.
-func (cff *configFileFilter) Read(p []byte) (n int, err error) {
+// Reads from the file and strips whitespace outside of strings as well as comments. With this method, fileTilter implements io.Reader.
+func (ff *fileFilter) Read(p []byte) (n int, err error) {
 	// temporarily save current position
-	i := cff.pos
+	i := ff.pos
 	var b, c byte
 
 	for i < len(p) {
-		b, err = cff.configFile.ReadByte()
+		b, err = ff.file.ReadByte()
 		if err != nil {
 			return
 		}
 
-		if cff.inString {
+		if ff.inString {
 			// use byte as-is
 			p[n] = b
 			n++
 
 			// check if this is the end of the string
 			if rune(b) == '"' {
-				cff.inString = !cff.inString
+				ff.inString = !ff.inString
 			}
 		} else {
 			switch rune(b) {
 			case '/':
 				// this is a comment, next byte has to be '/' as well, else it's invalid JSON
-				c, err = cff.configFile.ReadByte()
+				c, err = ff.file.ReadByte()
 				if err != nil {
 					return
 				}
 
 				if c == '/' {
 					// skip until new line
-					for c, err = cff.configFile.ReadByte(); err == nil && rune(c) != '\n'; c, err = cff.configFile.ReadByte() {
+					for c, err = ff.file.ReadByte(); err == nil && rune(c) != '\n'; c, err = ff.file.ReadByte() {
 						i++
 					}
 					if err != nil {
@@ -74,8 +74,8 @@ func (cff *configFileFilter) Read(p []byte) (n int, err error) {
 				// use byte
 				p[n] = b
 				n++
-				// entering a string
-				cff.inString = !cff.inString
+				// entering or exiting a string
+				ff.inString = !ff.inString
 
 			default:
 				// use byte as-is
@@ -88,7 +88,7 @@ func (cff *configFileFilter) Read(p []byte) (n int, err error) {
 	}
 
 	// advance position in file stream
-	cff.pos += i
+	ff.pos += i
 
 	// check if we're at the end of the file
 	if i < len(p) {
@@ -98,14 +98,14 @@ func (cff *configFileFilter) Read(p []byte) (n int, err error) {
 	return
 }
 
-// Parses a config file at fileName into the provided interface, which must be of a pointer type.
+// Parses a JSON file at fileName into the provided interface, which must be of a pointer type.
 func ParseFile(fileName string, v interface{}) (err error) {
-	cff, err := newConfigFileFilter(fileName)
+	ff, err := newFileFilter(fileName)
 	if err != nil {
 		return
 	}
 
 	// read filtered JSON and unmarshal it into the provided interface
-	err = json.NewDecoder(cff).Decode(v)
+	err = json.NewDecoder(ff).Decode(v)
 	return
 }
