@@ -1,3 +1,4 @@
+// Package jsonfile provides a way to parse JSON files including single line comments indicated by // at the beginning.
 package jsonfile
 
 import (
