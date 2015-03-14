@@ -14,7 +14,7 @@ type fileFilter struct {
 	inString bool // true if current position points inside a string; used to only strip whitespace outside of strings
 }
 
-func newfileFilter(fileName string) (ff *fileFilter, err error) {
+func newFileFilter(fileName string) (ff *fileFilter, err error) {
 	var file *os.File
 	file, err = os.Open(fileName)
 

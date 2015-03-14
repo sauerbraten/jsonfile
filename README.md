@@ -1,22 +1,22 @@
-# JSONconf
+# JSONfile
 
-This is a Go package to easily parse JSON configuration files into Go structs (or other types).
+This is a Go package to easily parse commented JSON files into Go structs (or other types).
 
 ## Usage
 
 Get the package:
 
-	$ go get github.com/sauerbraten/jsonconf
+	$ go get github.com/sauerbraten/jsonfile
 
 Import the package:
 
 	import (
-		"github.com/sauerbraten/jsonconf"
+		"github.com/sauerbraten/jsonfile"
 	)
 
 ## Example
 
-Write your configuration file (for example `config.json`) as a JSON object, like this (this is just an example of what a webserver configuration could look like):
+Write your commented JSON file (for example `config.json`) as a JSON object, like this (this is just an example of what a webserver configuration could look like):
 
 	{
 		// address to listen on
@@ -49,7 +49,7 @@ Then in your Go code, do this:
 	func init() {
 		config = Config{}
 
-		err := jsonconf.ParseFile("config.json", &config)
+		err := jsonfile.ParseFile("config.json", &config)
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -59,13 +59,13 @@ That's it, you can now easily access your configuration parameters in your code.
 
 ## Documentation
 
-Proper documentation is at http://godoc.org/github.com/sauerbraten/jsonconf. There isn't much to say, really.
+Proper documentation is at http://godoc.org/github.com/sauerbraten/jsonfile. There isn't much to say, really.
 
 ## License
 
 This code is licensed under a BSD License:
 
-Copyright (c) 2014 Alexander Willing. All rights reserved.
+Copyright (c) 2014-2015 Alexander Willing. All rights reserved.
 
 - Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
