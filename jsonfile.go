@@ -26,11 +26,10 @@ func newFileFilter(fileName string) (ff *fileFilter, err error) {
 
 // Reads from the file and strips whitespace outside of strings as well as comments. With this method, fileTilter implements io.Reader.
 func (ff *fileFilter) Read(p []byte) (n int, err error) {
-	// temporarily save current position
-	i := ff.pos
+	skippedBytes := 0
 	var b, c byte
 
-	for i < len(p) {
+	for n < len(p) {
 		b, err = ff.file.ReadByte()
 		if err != nil {
 			return
@@ -53,15 +52,18 @@ func (ff *fileFilter) Read(p []byte) (n int, err error) {
 				if err != nil {
 					return
 				}
+				skippedBytes += 2
 
 				if c == '/' {
 					// skip until new line
 					for c, err = ff.file.ReadByte(); err == nil && rune(c) != '\n'; c, err = ff.file.ReadByte() {
-						i++
+						skippedBytes++
 					}
+
 					if err != nil {
 						return
 					}
+					skippedBytes++
 				} else {
 					// '/' is an illegal character in JSON outside of a string
 					err = errors.New("illegal character '/' outside of string")
@@ -70,6 +72,7 @@ func (ff *fileFilter) Read(p []byte) (n int, err error) {
 
 			case ' ', '\t', '\n':
 				// skip whitespace
+				skippedBytes++
 
 			case '"':
 				// use byte
@@ -84,17 +87,10 @@ func (ff *fileFilter) Read(p []byte) (n int, err error) {
 				n++
 			}
 		}
-
-		i++
 	}
 
 	// advance position in file stream
-	ff.pos += i
-
-	// check if we're at the end of the file
-	if i < len(p) {
-		err = io.EOF
-	}
+	ff.pos += skippedBytes + n
 
 	return
 }
